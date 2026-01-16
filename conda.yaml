@@ -1,17 +1,20 @@
-yaml
-name: ship-trajectory-env
+name: ship-traj-mlflow
 channels:
   - conda-forge
+  - defaults
 dependencies:
-  - python=3.10
+  - python=3.10  # or 3.11 / 3.12
   - pip
+  - numpy
+  - pandas
+  - h5py
+  - scikit-learn
+  - matplotlib
+  - tqdm
+  - requests
   - pip:
-      - numpy
-      - pandas
-      - scikit-learn
-      - torch
-      - mlflow
-      - matplotlib
-      - seaborn
-      - tqdm
-      - pyyaml
+    - tensorflow>=2.10
+    - keras-tuner
+    - mlflow>=2.10
+    - gradio>=4.0
+    - joblib
