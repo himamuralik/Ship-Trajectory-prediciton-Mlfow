@@ -16,7 +16,7 @@ target_cols:
   - longitude
 
 # Sequence settings
-sequence_length: 20            # past timesteps used as input
+sequence_length: 23            # past timesteps used as input
 prediction_horizon: 6          # how many future positions to predict
 
 # Model hyperparameters
