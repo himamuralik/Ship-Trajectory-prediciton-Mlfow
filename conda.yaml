@@ -1,0 +1,17 @@
+yaml
+name: ship-trajectory-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - numpy
+      - pandas
+      - scikit-learn
+      - torch
+      - mlflow
+      - matplotlib
+      - seaborn
+      - tqdm
+      - pyyaml
