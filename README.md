@@ -1,111 +1,195 @@
-# 🚢 Ship Trajectory Prediction with MLflow
+# Ship Trajectory Prediction – MLflow Project
 
-![MLflow](https://img.shields.io/badge/MLflow-Tracking-blue)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-orange)
-![Python](https://img.shields.io/badge/Python-3.10-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
+This repository implements a **ship trajectory prediction system** with a clean, reproducible **MLflow Project** setup. It supports training, evaluation, and inference while tracking experiments, parameters, metrics, and models using MLflow.
 
-> **A production-ready MLOps pipeline for maritime vessel trajectory forecasting.**
-> 
-> This repository implements a deep learning (LSTM) training pipeline integrated with **MLflow** for experiment tracking, model versioning, and rigorous **latency benchmarking** (P95/Throughput) suitable for edge deployment analysis.
+The project is designed to be **research-grade and interview-ready**, following MLflow best practices.
 
 ---
 
-## ⚡ Key Features
+## Project Structure
 
-* **MLflow Integration:** Automatically logs hyperparameters, training loss, and final evaluation metrics.
-* **Latency Benchmarking:** Custom evaluation module (`evaluation/latency.py`) to measure **Mean Latency**, **P95 Latency**, and **Throughput** (samples/sec).
-* **Reproducibility:** Seed setting and config-driven experiments (`configs/config.yaml`) for consistent runs.
-* **Modular Design:** Clean separation of data loading, preprocessing, model definition, and training loops.
-
----
-
-## 🛠️ Repository Structure
-
-```text
-Ship-Trajectory-prediction-Mlflow
-│
-├── MLproject                   # MLflow project definition
-├── conda.yaml                  # Environment dependencies
-├── README.md                   # Project documentation
-│
-├── src/                        # Source code
-│   ├── main.py                 # Entry point for training & evaluation
-│   │
-│   ├── data/                   # Data pipeline
-│   │   ├── load_data.py        # CSV ingestion
-│   │   ├── preprocess.py       # StandardScaler & cleaning
-│   │   ├── feature_engineering.py # Sliding window sequence generation
-│   │
-│   ├── models/                 # PyTorch model definitions
-│   │   ├── model.py            # LSTM Architecture
-│   │   ├── train.py            # Training loop
-│   │
-│   ├── evaluation/             # Benchmarking modules
-│   │   ├── latency.py          # Inference speed measurement
-│   │   ├── metrics.py          # RMSE, MAE, R2 calculation
-│   │
-│   └── utils/                  # Utilities
-│       ├── logging.py          # MLflow logging wrappers
-│       ├── seed.py             # Reproducibility helpers
 ```
-⚙️ Model Architecture
-The core model uses a Long Short-Term Memory (LSTM) network designed for sequential time-series forecasting.
+Ship-Trajectory-Prediction-MLflow/
+│
+├── MLproject              # MLflow project definition
+├── conda.yaml             # Reproducible environment
+├── config.yaml            # Experiment configuration
+├── README.md
+│
+├── src/
+│   ├── main.py             # Training entry point
+│   ├── evaluate.py         # Evaluation script
+│   ├── inference/
+│   │   └── app.py          # Inference / demo app
+│   ├── models/             # Model architectures
+│   ├── utils/              # Logging, metrics, helpers
+│   └── data/               # Data loading & preprocessing
+│
+└── mlruns/                 # MLflow tracking directory (auto-created)
+```
 
-Input: Sequence of vessel states (Lat, Lon, SOG, COG, etc.)
+---
 
-Hidden Layers: Configurable hidden dimension LSTM layers.
+## Requirements
 
-Output: Linear head predicting the next step(s) in the trajectory.
+* Conda (Miniconda / Anaconda)
+* Python 3.10
+* CPU-only execution (default)
 
-Optimization: Adam Optimizer with MSE Loss.
-🚀 How to Run
-1. Prerequisites
-Ensure you have conda installed. Create the environment:
+All dependencies are managed via **MLflow + conda.yaml**.
 
-Bash
+---
 
-conda env create -f conda.yaml
-conda activate ship-trajectory-env
-2. Run with MLflow (Recommended)
-This project is set up as an MLflow Project. You can run it directly:
+## Environment Setup
 
-Bash
+MLflow automatically creates the environment defined in `conda.yaml`.
 
-# Run with default config
+```yaml
+channels:
+  - pytorch
+  - conda-forge
+
+dependencies:
+  - python=3.10
+  - pytorch
+  - cpuonly
+  - pip:
+      - mlflow>=2.10
+      - numpy
+      - pandas
+      - scikit-learn
+```
+
+---
+
+## MLflow Configuration
+
+The project explicitly sets:
+
+* **Tracking URI**: local filesystem (`./mlruns`)
+* **Experiment name**: `Ship-Trajectory-Prediction`
+
+This ensures:
+
+* Consistent experiment grouping
+* Full reproducibility
+* Clean run comparison
+
+---
+
+## Running the Project with MLflow
+
+### 1. Training
+
+Run the default training pipeline:
+
+```bash
 mlflow run .
+```
 
-# Run with a specific config file
-mlflow run . -P config_path=configs/custom_config.yaml
-3. Run Manually
-You can also execute the script directly using Python:
+Run training for a specific architecture:
 
-Bash
+```bash
+mlflow run . -P arch=lstm
+```
 
-python src/main.py --config_path configs/config.yaml
-## 📊 Evaluation & Metrics
-The pipeline automatically logs the following metrics to the MLflow server:
+Available parameters:
 
-Accuracy Metrics
-RMSE (Root Mean Squared Error): Overall trajectory deviation.
+* `config_path` (default: `config.yaml`)
+* `arch` (default: `all`)
 
-MAE (Mean Absolute Error): Average distance error.
+Each run logs:
 
-R² Score: Goodness of fit.
+* Hyperparameters
+* Training & validation metrics
+* Model artifacts
+* Configuration file
 
-Performance Metrics (Latency)
-Crucial for edge deployment (e.g., on buoys or USVs):
+---
 
-Mean Latency (ms): Average inference time per sample.
+### 2. Evaluation
 
-P95 Latency (ms): The 95th percentile latency (worst-case handling).
+```bash
+mlflow run . -e evaluate
+```
 
-Throughput: Number of samples processed per second.
+Evaluation runs are tracked as separate MLflow runs with their own metrics.
 
-## 👤 Author
-Hima Murali
+---
 
-Focus: Maritime Autonomy, MLOps, Time-Series Modeling
+### 3. Inference / Deployment
 
-## 📄 License
-This project is licensed under the MIT License.
+```bash
+mlflow run . -e deploy
+```
+
+This launches a **local inference application** (custom app, not MLflow model serving).
+
+---
+
+## Experiment Tracking
+
+For each MLflow run, the following are logged:
+
+* **Parameters**: architecture, hyperparameters, dataset settings
+* **Metrics**: prediction error, trajectory deviation, latency (if applicable)
+* **Artifacts**:
+
+  * Trained model
+  * Configuration file
+  * Plots / logs (if enabled)
+
+Runs are tagged with:
+
+* `architecture`
+* `task = trajectory_prediction`
+
+---
+
+## Viewing Results
+
+Launch the MLflow UI:
+
+```bash
+mlflow ui
+```
+
+Then open:
+
+```
+http://localhost:5000
+```
+
+---
+
+## Key Design Principles
+
+* **Reproducibility first** – MLflow Projects + conda
+* **Edge-aware modeling** – CPU-friendly architectures
+* **Robustness to noisy data** – real-world trajectory conditions
+* **Clear separation** – training, evaluation, inference
+
+---
+
+## Notes
+
+* This project uses **local MLflow tracking** by default.
+* It can be easily extended to:
+
+  * MLflow Model Registry
+  * Remote tracking servers
+  * Cloud or edge deployment pipelines
+
+---
+
+## License
+
+MIT License
+
+---
+
+## Author
+
+Hima Murali Kattur
+AI Systems & Trajectory Prediction
+
