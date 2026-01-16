@@ -1,45 +1,26 @@
-# src/models/model.py
-import torch.nn as nn
+import tensorflow as tf
+from tensorflow.keras.layers import LSTM, GRU, Bidirectional, Dense, Attention, Input, Reshape
+from tensorflow.keras.models import Sequential
 
 
-class LSTMModel(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super().__init__()
-        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)
-        self.fc = nn.Linear(hidden_size, output_size)
+def build_model(arch, input_shape, output_shape=(6, 2), hidden_units=64):
+    model = Sequential()
+    model.add(Input(shape=input_shape))
 
-    def forward(self, x):
-        _, (hn, _) = self.lstm(x)
-        return self.fc(hn.squeeze(0))
+    if arch == "lstm":
+        model.add(LSTM(hidden_units, return_sequences=False))
+    elif arch == "gru":
+        model.add(GRU(hidden_units, return_sequences=False))
+    elif arch == "bilstm":
+        model.add(Bidirectional(LSTM(hidden_units, return_sequences=False)))
+    elif arch == "bilstm_attention":
+        model.add(Bidirectional(LSTM(hidden_units, return_sequences=True)))
+        model.add(Attention())
+    else:
+        raise ValueError(f"Unknown architecture: {arch}")
 
+    model.add(Dense(output_shape[0] * output_shape[1]))
+    model.add(Reshape(output_shape))
 
-class BiLSTMModel(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super().__init__()
-        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True, bidirectional=True)
-        self.fc = nn.Linear(hidden_size * 2, output_size)
-
-    def forward(self, x):
-        _, (hn, _) = self.lstm(x)
-        hn = hn.transpose(0, 1).contiguous().view(hn.size(1), -1)
-        return self.fc(hn)
-
-
-class GRUModel(nn.Module):
-    # similar implementation...
-
-
-class BiLSTMAttentionModel(nn.Module):
-    # implement attention layer...
-
-
-def get_model_class(arch_name: str):
-    mapping = {
-        "lstm": LSTMModel,
-        "bilstm": BiLSTMModel,
-        "gru": GRUModel,
-        "bilstm_attention": BiLSTMAttentionModel,
-    }
-    if arch_name not in mapping:
-        raise ValueError(f"No implementation for {arch_name}")
-    return mapping[arch_name]
+    model.compile(optimizer='adam', loss='mse')
+    return model
