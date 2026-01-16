@@ -1,0 +1,23 @@
+# config.yaml
+
+seed: 42
+
+data_path: "data/your_processed_file.h5"      # ← change to your actual file
+feature_cols: ["lat", "lon", "sog", "cog"]    # ← adjust to your columns
+target_cols: ["lat", "lon"]
+
+sequence_length: 20
+prediction_horizon: 6
+
+hidden_size: 128
+lr: 0.001
+epochs: 30
+batch_size: 64
+
+# You can add architecture-specific params later
+lstm:
+  num_layers: 2
+gru:
+  num_layers: 2
+bilstm_attention:
+  attention_heads: 4
