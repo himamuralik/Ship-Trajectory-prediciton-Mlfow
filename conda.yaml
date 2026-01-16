@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.10  # or 3.11 / 3.12
+  - python=3.10
   - pip
   - numpy
   - pandas
@@ -11,10 +11,12 @@ dependencies:
   - scikit-learn
   - matplotlib
   - tqdm
-  - requests
+  - pyyaml
+  # PyTorch Dependencies
+  - pytorch
+  - torchvision
+  - cpuonly  # Remove this if you have a GPU
   - pip:
-    - tensorflow>=2.10
-    - keras-tuner
     - mlflow>=2.10
     - gradio>=4.0
     - joblib
