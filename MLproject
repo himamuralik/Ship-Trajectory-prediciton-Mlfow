@@ -3,16 +3,17 @@ name: ShipTrajectoryPrediction
 conda_env: conda.yaml
 
 entry_points:
-  download_data:
-    command: "python data_download.py"
-
-  preprocess_data:
-    command: "python data_preprocess.py"
-
   train:
     parameters:
       arch: {type: str, default: "all"}
-    command: "python train.py --arch {arch}"
+      config_path: {type: str, default: "config.yaml"}
+    command: "python -m src.main --arch {arch} --config_path {config_path}"
 
   evaluate:
-    command: "python evaluate.py"
+    parameters:
+      arch: {type: str, default: "all"}
+    command: "python -m src.evaluation --arch {arch}"
+
+  # Optional: add inference if you have app.py
+  infer:
+    command: "python -m src.inference.app"
