@@ -7,13 +7,16 @@ entry_points:
     parameters:
       config_path: {type: str, default: "config.yaml"}
       arch: {type: str, default: "all"}
-    command: "python src/main.py --config_path {config_path} --arch {arch}"
+    # CHANGED: Uses "-m src.main" so Python handles imports correctly
+    command: "python -m src.main --config_path {config_path} --arch {arch}"
 
   evaluate:
     parameters:
       config_path: {type: str, default: "config.yaml"}
       arch: {type: str, default: "all"}
-    command: "python src/evaluate.py --config_path {config_path} --arch {arch}"
+    # CHANGED: Uses "-m src.evaluate"
+    command: "python -m src.evaluate --config_path {config_path} --arch {arch}"
 
   deploy:
-    command: "python src/inference/app.py"
+    # CHANGED: Uses "-m src.inference.app"
+    command: "python -m src.inference.app"
